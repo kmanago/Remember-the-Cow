@@ -1,24 +1,23 @@
+
 <!DOCTYPE html>
 <?php
-   require_once 'start.php';
+	session_start();
+	
+	$db = new PDO('mysql:dbname=users;host=localhost','root','');
 	
 	//selects from the database
 	$itemsQuery = $db->prepare("
-		SELECT id, name, done
-		FROM items
-		WHERE user = :user
+		SELECT todolist.id, item
+		FROM todolist JOIN users ON users.id = todolist.id
+		WHERE username = :username
 	");
 	
 	$itemsQuery -> execute([
-		'user' => $_SESSION['id'];
+		'username' => $_SESSION['username']
 	]);
 	
-	$items = $itemsQuery-> rowCount () ? $itemsQuery : [];
+	$items = $itemsQuery-> rowCount() ? $itemsQuery : [];
 	
-	foreach($items as items){
-		print_r($item);
-	}
-    
 ?>
 
 <html>
@@ -27,6 +26,8 @@
 		<title>Remember the Cow</title>
 		<link href="cow.css" type="text/css" rel="stylesheet" />
 		<link href="favicon.ico" type="image/ico" rel="shortcut icon" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
 	</head>
 
 	<body>
@@ -40,39 +41,38 @@
 		<div id="main">
 
             <h2><?php echo $_SESSION['username'];?> To-Do List</h2>
-			
-			<?php if (!empty($items)): ?>
-				<ul id="todolist">
-				
+			<ul id="todolist">
+                
+			<?php if (!empty($items)): ?>		
 				<?php
-					foreach($items as $item): 	
+					foreach($items as $item): 
+				    $object = trim($item['item']);
 				?>
-					<li>
-						<span class="item <php echo $item'done'] ? ' done' : ''?>"
-						<?php echo $item['name']; ?></span>
-						
-						<?php if (!$item['done']): ?> <!--if an item isn't done delete it from the list -->
-							<form id="delete-item" action="submit.php" method="post">
-								<input type="submit" value="Delete" />
-							</form>
-						<?php endif; ?>
+					<li id="<?php echo htmlspecialchars($object); ?>">
+                        <?php //echo $item['item'];
+                            $object = trim($item['item']);
+                        ?>
+                        <form action="submit2.php" method="post">
+                            <?php echo "<input name='delete' type='text' value='$object''>"?>
+                            <input id = "listitem" type=submit value="Delete"/>
+                        </form>
+
 					</li>
 					
 					<?php
 						endforeach; 	
 					?>
-					
-					<li><!--add item to the list -->		
-						<form id="add-item" action="submit.php" method="post">
-							<div><input name="name" type="text" /><input type="submit" value="Add" /></div>
-						</form>
-					</li>
-               </ul>
+				   
 			<?php endif; ?>
-			   
+			   <li><!--add item to the list -->		
+						<form id="add-item" action="submit2.php" method="post">
+							<div><input name="name" type="text" value=""/><input type="submit" value="Add" /></div>
+						</form>
+				</li>
+                </ul>
 			<p>
 			<!--log out-->
-				<a href="logout.php"><b><u>Log Out</u></b></a> <em>(last login from this computer was ???)</em>
+				<a href="logout.php"><b><u>Log Out</u></b></a> <em>(logged in since <?php echo $_SESSION['cookie']; ?>)</em>
 			</p>
 		</div>
 
@@ -84,4 +84,10 @@
 
 		</div>
 	</body>
+    <script>
+        
+        $("#listitem").click(function(){
+           $(this).parent().parent().remove(); 
+        });
+    </script>
 </html>

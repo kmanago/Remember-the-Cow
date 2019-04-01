@@ -50,3 +50,6 @@ li form input[type="submit"] {
 #todolist li {
 	clear: right;
 }
+ul{
+    list-style-type: none;
+}

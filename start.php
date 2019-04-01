@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -33,7 +36,7 @@
 			</form>
 
 			<p>
-				<em>(last login from this computer was ???)</em>
+				<em>(last login from this computer was <?php echo $_COOKIE['Time']; ?>)</em>
 			</p>
 		</div>
 
